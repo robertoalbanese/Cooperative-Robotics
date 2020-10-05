@@ -52,9 +52,9 @@ uvms.q = [-0.0031 0 0.0128 -1.2460 0.0137 0.0853-pi/2 0.0137]';
 % R(rot_x, rot_y, rot_z) = Rz (rot_z) * Ry(rot_y) * Rx(rot_x)
 uvms.p = [10.5 35.5 -36 0 0 pi/2]'; 
 
-% defines the goal position for the end-effector/tool position task
+% defines the goal position for the vehicle position task
 uvms.goalPosition = [10.5 37.5 -38]';
-%uvms.wRg = rotation(0, pi, pi/2);
+%uvms.wRg = rotation(0, pi, pi/2);  /old
 uvms.wRg = rotation(0, 0, 0);
 uvms.wTg = [uvms.wRg uvms.goalPosition; 0 0 0 1];
 
@@ -82,7 +82,7 @@ for t = 0:deltat:end_time
    
     % add all the other tasks here!
     % the sequence of iCAT_task calls defines the priority
-    %[Qp, ydotbar] = iCAT_task(uvms.A.t,    uvms.Jt,    Qp, ydotbar, uvms.xdot.t,  0.0001,   0.01, 10);
+    %[Qp, ydotbar] = iCAT_task(uvms.A.t,    uvms.Jt,    Qp, ydotbar, uvms.xdot.t,  0.0001,   0 .01, 10);    /old
     [Qp, ydotbar] = iCAT_task(uvms.A.v,     uvms.Jv,    Qp, ydotbar, uvms.xdot.v,  0.0001,   0.01, 10);
     [Qp, ydotbar] = iCAT_task(eye(13),     eye(13),    Qp, ydotbar, zeros(13,1),  0.0001,   0.01, 10);    % this task should be the last one
     
@@ -107,7 +107,7 @@ for t = 0:deltat:end_time
    
     % add debug prints here
     if (mod(t,0.1) == 0)
-        t
+        %t
         uvms.sensorDistance
     end
 
