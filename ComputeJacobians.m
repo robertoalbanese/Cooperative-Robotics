@@ -24,19 +24,20 @@ function [uvms] = ComputeJacobians(uvms)
 % Ste is the rigid body transformation from vehicle-frame to end-effector
 % frame projected on <v>
 uvms.Ste = [eye(3) zeros(3);  -skew(uvms.vTe(1:3,1:3)*uvms.eTt(1:3,4)) eye(3)];
+
 % uvms.bJe contains the arm end-effector Jacobian (6x7) wrt arm base
 % top three rows are angular velocities, bottom three linear velocities
-uvms.Jt_a  = uvms.Ste * [uvms.vTb(1:3,1:3) zeros(3,3); zeros(3,3) uvms.vTb(1:3,1:3)] * uvms.bJe;
-uvms.Jv_a  = uvms.Ste * [uvms.vTb(1:3,1:3) zeros(3,3); zeros(3,3) uvms.vTb(1:3,1:3)] * uvms.bJe;
+%uvms.Jt_a  = uvms.Ste * [uvms.vTb(1:3,1:3) zeros(3,3); zeros(3,3) uvms.vTb(1:3,1:3)] * uvms.bJe;
+%uvms.Jv_a  = [uvms.wTv(1:3,1:3) zeros(3,3); zeros(3,3) uvms.wTv(1:3,1:3)] * uvms.Ste * [uvms.vTb(1:3,1:3) zeros(3,3); zeros(3,3) uvms.vTb(1:3,1:3)] * uvms.bJe;
+uvms.Jv_a = zeros(6:7);
 % vehicle contribution is simply a rigid body transformation from vehicle
 % frame to tool frame. Notice that linear and angular velocities are
 % swapped due to the different definitions of the task and control
 % variables
-uvms.Jt_v = [zeros(3) eye(3); eye(3) -skew(uvms.vTt(1:3,4))];
-uvms.Jv_v = [zeros(3) eye(3); eye(3) -skew(uvms.wTv(1:3,4))];
+%uvms.Jt_v = [zeros(3) eye(3); eye(3) -skew(uvms.vTt(1:3,4))];
+uvms.Jv_v = [zeros(3) eye(3); eye(3) -skew(uvms.vTb(1:3,4))];
 % juxtapose the two Jacobians to obtain the global one
-uvms.Jt = [uvms.Jt_a uvms.Jt_v];
+%uvms.Jt = [uvms.Jt_a uvms.Jt_v];
 uvms.Jv = [uvms.Jv_a uvms.Jv_v];
-
 
 end

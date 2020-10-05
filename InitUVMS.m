@@ -23,6 +23,7 @@ uvms.jlmax  = [2.9;1.65;2.9;0.01;2.9;1.25;2.8];
 
 % to be computed at each time step
 uvms.wTv = eye(4,4);
+uvms.wTg = eye(4,4);
 uvms.wTt = eye(4,4);
 uvms.vTw = eye(4,4);
 uvms.vTe = eye(4,4);
