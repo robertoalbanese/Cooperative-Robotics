@@ -35,8 +35,7 @@ uvms.Jv_a = zeros(6:7);
 % swapped due to the different definitions of the task and control
 % variables
 %uvms.Jt_v = [zeros(3) eye(3); eye(3) -skew(uvms.vTt(1:3,4))];  /old
-uvms.Jv_v = [zeros(3) eye(3); eye(3) -skew(uvms.vTb(1:3,4))];
-
+uvms.Jv_v = [zeros(3) eye(3); eye(3) uvms.wTv(1:3,1:3)];
 % juxtapose the two Jacobians to obtain the global one
 %uvms.Jt = [uvms.Jt_a uvms.Jt_v];  /old
 uvms.Jv = [uvms.Jv_a uvms.Jv_v];
