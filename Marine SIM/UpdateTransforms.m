@@ -8,4 +8,3 @@ uvms.vTg = uvms.vTw*uvms.wTg;
 uvms.vTe = uvms.vTb*uvms.bTe;
 uvms.vTt = uvms.vTe*uvms.eTt;
 uvms.wTt = uvms.wTv*uvms.vTt;
-uvms.wTg = uvms.wTv*uvms.vTg;

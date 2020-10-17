@@ -3,5 +3,7 @@ function [uvms] = ComputeActivationFunctions(uvms, mission)
 
 % arm tool position control
 % always active
-%uvms.A.t = eye(6);  /old
+uvms.A.t = eye(6);
+
+% vehicle position control
 uvms.A.v = eye(6);

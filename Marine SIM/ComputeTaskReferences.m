@@ -2,16 +2,16 @@ function [uvms] = ComputeTaskReferences(uvms, mission)
 % compute the task references here
 
 % reference for tool-frame position control task
-%[ang, lin] = CartError(uvms.vTg , uvms.vTt);  /old
-[ang, lin] = CartError(uvms.wTg , uvms.wTv);
-
-%uvms.xdot.t = 0.2 * [ang; lin];  /old
-uvms.xdot.v = 0.2 * [ang; lin];
-
+[ang, lin] = CartError(uvms.vTg , uvms.vTt);
+uvms.xdot.t = 0.2 * [ang; lin];
 % limit the requested velocities...
-% uvms.xdot.t(1:3) = Saturate(uvms.xdot.t(1:3), 0.2);  /old
-% uvms.xdot.t(4:6) = Saturate(uvms.xdot.t(4:6), 0.2);  /old
+uvms.xdot.t(1:3) = Saturate(uvms.xdot.t(1:3), 0.2);
+uvms.xdot.t(4:6) = Saturate(uvms.xdot.t(4:6), 0.2);
 
+% reference for vehicle position control task
+[ang_v, lin_v] = CartError(uvms.wTgv , uvms.wTv);
+uvms.xdot.v = 0.2 * [ang_v; lin_v];
+% limit the requested velocities...
 uvms.xdot.v(1:3) = Saturate(uvms.xdot.v(1:3), 0.2);
 uvms.xdot.v(4:6) = Saturate(uvms.xdot.v(4:6), 0.2);
 

@@ -23,7 +23,6 @@ uvms.jlmax  = [2.9;1.65;2.9;0.01;2.9;1.25;2.8];
 
 % to be computed at each time step
 uvms.wTv = eye(4,4);
-uvms.wTg = eye(4,4);
 uvms.wTt = eye(4,4);
 uvms.vTw = eye(4,4);
 uvms.vTe = eye(4,4);
@@ -43,9 +42,6 @@ uvms.Jha = [];
 uvms.Jt_a = [];
 uvms.Jt_v = [];
 uvms.Jt = [];
-uvms.Jv_a = [];
-uvms.Jv_v = [];
-uvms.Jv = [];
 
 uvms.xdot.jl = [];
 uvms.xdot.mu = [];
@@ -57,7 +53,6 @@ uvms.A.jl = zeros(7,7);
 uvms.A.mu = 0;
 uvms.A.ha = zeros(1,1);
 uvms.A.t = zeros(6,6);
-uvms.A.v = zeros(6,6);
 
 end
 
