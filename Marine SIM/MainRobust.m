@@ -58,8 +58,8 @@ uvms.wRg = rotation(0, pi, pi/2);
 uvms.wTg = [uvms.wRg uvms.goalPosition; 0 0 0 1];
 
 % goal position for vehicle position task
-uvms.goalPosition_v = [12.2025   37.3748  -39.8860+2]';
-uvms.wRgv = rotation(0, 0, 0);
+uvms.goalPosition_v = [12.2025   37.3748  -39.8860]';
+uvms.wRgv = rotation(0, pi/2, 0);
 uvms.wTgv = [uvms.wRgv uvms.goalPosition_v; 0 0 0 1];
 
 % defines the tool control point
@@ -87,6 +87,8 @@ for t = 0:deltat:end_time
     % the sequence of iCAT_task calls defines the priority
     %[Qp, ydotbar] = iCAT_task(uvms.A.t,    uvms.Jt,    Qp, ydotbar, uvms.xdot.t,  0.0001,   0.01, 10);
     
+    [Qp, ydotbar] = iCAT_task(uvms.A.ha,  uvms.Jha,   Qp, ydotbar, uvms.xdot.ha,  0.0001,   0.01, 10);
+    [Qp, ydotbar] = iCAT_task(uvms.A.a,    uvms.Ja,    Qp, ydotbar, uvms.xdot.a,  0.0001,   0.01, 10);
     [Qp, ydotbar] = iCAT_task(uvms.A.v,    uvms.Jv,    Qp, ydotbar, uvms.xdot.v,  0.0001,   0.01, 10);
     [Qp, ydotbar] = iCAT_task(eye(13),     eye(13),    Qp, ydotbar, zeros(13,1),  0.0001,   0.01, 10);    % this task should be the last one
     

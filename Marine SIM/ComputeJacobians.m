@@ -35,7 +35,23 @@ uvms.Jt_v = [zeros(3) eye(3); eye(3) -skew(uvms.vTt(1:3,4))];
 % juxtapose the two Jacobians to obtain the global one
 uvms.Jt = [uvms.Jt_a uvms.Jt_v];
 
-%vehicle position task jacobian
+%vehicle-frame position control
 uvms.Jv = [ zeros(3,7)        zeros(3,3)  uvms.wTv(1:3,1:3);
             zeros(3,7) uvms.wTv(1:3,1:3)        zeros(3,3)];
+
+%horizontal attitude
+w_kw = [0 0 1]';
+v_kv = [0 0 1]';
+v_kw = uvms.vTw(1:3,1:3) * w_kw;
+
+uvms.v_rho = ReducedVersorLemma(v_kw, v_kv);
+v_n = uvms.v_rho/norm(uvms.v_rho);
+
+uvms.Jha = [zeros(1,7) zeros(1,3) v_n'];
+
+% minimum altitude
+uvms.Ja = [zeros(1,7) 0 0 1 zeros(1,3)];
+
+
+
 end
