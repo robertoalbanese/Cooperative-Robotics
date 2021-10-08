@@ -6,7 +6,7 @@ close all
 
 % Simulation variables (integration and final time)
 deltat = 0.005;
-end_time = 25;
+end_time = 125;
 loop = 1;
 maxloops = ceil(end_time/deltat);
 
@@ -58,8 +58,8 @@ uvms.wRg = rotation(0, pi, pi/2);
 uvms.wTg = [uvms.wRg uvms.goalPosition; 0 0 0 1];
 
 % goal position for vehicle position task
-uvms.goalPosition_v = [12.2025   37.3748  -39.8860]';
-uvms.wRgv = rotation(0, pi/2, 0);
+uvms.goalPosition_v = [10.5 37.5 -38]';
+uvms.wRgv = rotation(0, 0, 0);
 uvms.wTgv = [uvms.wRgv uvms.goalPosition_v; 0 0 0 1];
 
 % defines the tool control point
@@ -84,13 +84,15 @@ for t = 0:deltat:end_time
     ydotbar = zeros(13,1);
     Qp = eye(13); 
     % add all the other tasks here!
-    % the sequence of iCAT_task calls defines the priority
-    %[Qp, ydotbar] = iCAT_task(uvms.A.t,    uvms.Jt,    Qp, ydotbar, uvms.xdot.t,  0.0001,   0.01, 10);
+    % the sequence of iCAT_task calls defines the priority    
     
-    [Qp, ydotbar] = iCAT_task(uvms.A.ha,  uvms.Jha,   Qp, ydotbar, uvms.xdot.ha,  0.0001,   0.01, 10);
-    [Qp, ydotbar] = iCAT_task(uvms.A.a,    uvms.Ja,    Qp, ydotbar, uvms.xdot.a,  0.0001,   0.01, 10);
-    [Qp, ydotbar] = iCAT_task(uvms.A.v,    uvms.Jv,    Qp, ydotbar, uvms.xdot.v,  0.0001,   0.01, 10);
-    [Qp, ydotbar] = iCAT_task(eye(13),     eye(13),    Qp, ydotbar, zeros(13,1),  0.0001,   0.01, 10);    % this task should be the last one
+    [Qp, ydotbar] = iCAT_task(uvms.A.ha,  uvms.Jha,   Qp, ydotbar, uvms.xdot.ha,  0.0001,   0.01, 10); % horizontal attitude task
+    [Qp, ydotbar] = iCAT_task(uvms.A.ma,    uvms.Jma,    Qp, ydotbar, uvms.xdot.ma,  0.0001,   0.01, 10); % minimum altitude
+    [Qp, ydotbar] = iCAT_task(uvms.A.v,    uvms.Jv,    Qp, ydotbar, uvms.xdot.v,  0.0001,   0.01, 10); % vehicle-frame position control task
+    [Qp, ydotbar] = iCAT_task(uvms.A.t,    uvms.Jt,    Qp, ydotbar, uvms.xdot.t,  0.0001,   0.01, 10); % tool frame task
+    
+    [Qp, ydotbar] = iCAT_task(eye(13),   eye(13), Qp, ydotbar, zeros(13,1), 0.0001, 0.01, 10); %this task should always be the last one 
+    
     
     % get the two variables for integration
     uvms.q_dot = ydotbar(1:7);
@@ -102,6 +104,7 @@ for t = 0:deltat:end_time
     uvms.p = integrate_vehicle(uvms.p, uvms.p_dot, deltat);
     
     % check if the mission phase should be changed
+    mission.phase_time = mission.phase_time + deltat;
     [uvms, mission] = UpdateMissionPhase(uvms, mission);
     
     % send packets to Unity viewer
@@ -114,7 +117,8 @@ for t = 0:deltat:end_time
     % add debug prints here
     if (mod(t,0.1) == 0)
         t
-        uvms.sensorDistance
+        mission.phase
+        mission.phase_time
     end
 
     % enable this to have the simulation approximately evolving like real

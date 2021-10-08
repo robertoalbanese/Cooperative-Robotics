@@ -50,7 +50,7 @@ v_n = uvms.v_rho/norm(uvms.v_rho);
 uvms.Jha = [zeros(1,7) zeros(1,3) v_n'];
 
 % minimum altitude
-uvms.Ja = [zeros(1,7) 0 0 1 zeros(1,3)];
+uvms.Jma = [zeros(1,7) 0 0 1 zeros(1,3)];
 
 
 

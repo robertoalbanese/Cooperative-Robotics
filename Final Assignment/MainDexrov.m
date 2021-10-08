@@ -1,4 +1,4 @@
- function MainDexrov
+function MainDexrov
 addpath('./simulation_scripts');
 clc;
 clear;
@@ -6,11 +6,12 @@ close all
 
 % Simulation variables (integration and final time)
 deltat = 0.005;
-end_time = 15;
+end_time = 35;
 loop = 1;
 maxloops = ceil(end_time/deltat);
 
 % this struct can be used to evolve what the UVMS has to do
+mission.enabled = 0;
 mission.phase = 1;
 mission.phase_time = 0;
 
@@ -45,7 +46,7 @@ uvms.q = [-0.0031 1.2586 0.0128 -1.2460 0.0137 0.0853-pi/2 0.0137]';
 % [x y z r(rot_x) p(rot_y) y(rot_z)]
 % RPY angles are applied in the following sequence
 % R(rot_x, rot_y, rot_z) = Rz (rot_z) * Ry(rot_y) * Rx(rot_x)
-uvms.p = [-1.9379 10.4813-6.1 -29.7242-0.1 0 0 0]';
+uvms.p = [-1.9379 10.4813-6.1 -29.7242-0.1 0 0.01 0]';
 
 % initial goal position definition
 % slightly over the top of the pipe
@@ -53,6 +54,11 @@ distanceGoalWrtPipe = 0.3;
 uvms.goalPosition = pipe_center + (pipe_radius + distanceGoalWrtPipe)*[0 0 1]';
 uvms.wRg = rotation(pi,0,0);
 uvms.wTg = [uvms.wRg uvms.goalPosition; 0 0 0 1];
+
+% define a position goal for a "safe waypoint navigation"
+uvms.v_goalPosition = pipe_center + (pipe_radius + distanceGoalWrtPipe + 1.5)*[0 0 1]';
+uvms.wRgv = rotation(0, -0.06, 0.5);
+uvms.wTgv = [uvms.wRgv uvms.v_goalPosition; 0 0 0 1];
 
 % defines the tool control point
 uvms.eTt = eye(4);
@@ -70,20 +76,30 @@ for t = 0:deltat:end_time
     Qp = eye(13); 
     % add all the other tasks here!
     % the sequence of iCAT_task calls defines the priority
-    [Qp, rhop] = iCAT_task(uvms.A.mu,   uvms.Jmu,   Qp, rhop, uvms.xdot.mu, 0.000001, 0.0001, 10);
-    [Qp, rhop] = iCAT_task(uvms.A.ha,   uvms.Jha,   Qp, rhop, uvms.xdot.ha, 0.0001,   0.01, 10);
-    [Qp, rhop] = iCAT_task(uvms.A.t,    uvms.Jt,    Qp, rhop, uvms.xdot.t,  0.0001,   0.01, 10);
+    %[Qp, rhop] = iCAT_task(uvms.A.mu,   uvms.Jmu,   Qp, rhop, uvms.xdot.mu, 0.000001, 0.0001, 10);
+    [Qp, rhop] = iCAT_task(uvms.A.ua,   uvms.Jua,   Qp, rhop, uvms.xdot.ua, 0.0001,   0.01, 10); % under actuation
+    [Qp, ydotbar] = iCAT_task(uvms.A.jlim,   uvms.Jjlim,   Qp, ydotbar, uvms.xdot.jlim,  0.0001,   0.01, 10); % joint limit 
+    [Qp, rhop] = iCAT_task(uvms.A.ha,   uvms.Jha,   Qp, rhop, uvms.xdot.ha, 0.0001,   0.01, 10); % horizontal attitude
+    [Qp, rhop] = iCAT_task(uvms.A.v,     uvms.Jv,    Qp, rhop, uvms.xdot.v,  0.0001,   0.01, 10); % tool control task
+    [Qp, rhop] = iCAT_task(uvms.A.t,     uvms.Jt,    Qp, rhop, uvms.xdot.t,  0.0001,   0.01, 10); % tool control task
+    [Qp, rhop] = iCAT_task(uvms.A.jfp,   uvms.Jjfp,   Qp, rhop, uvms.xdot.jfp, 0.000001, 0.0001, 10); % joint preferred shape
     [Qp, rhop] = iCAT_task(eye(13),     eye(13),    Qp, rhop, zeros(13,1),  0.0001,   0.01, 10);    % this task should be the last one
     
     % get the two variables for integration
     uvms.q_dot = rhop(1:7);
     uvms.p_dot = rhop(8:13);
     
+    %Apply sinusoidal disturbancies before integrating
+    uvms.p_dot(5) = 0.2 *sin(2*pi*0.1*t);
+%   uvms.p_dot(4) = 0.2*sin(2*pi*0.5*t);
+%   uvms.p_dot(6) = 0.2*sin(2*pi*0.5*t);
+    
     % Integration
 	uvms.q = uvms.q + uvms.q_dot*deltat;
     % beware: p_dot should be projected on <v>
     uvms.p = integrate_vehicle(uvms.p, uvms.p_dot, deltat);
     
+    uvms.ee_pos = uvms.wTe(1:3,4);
     % check if the mission phase should be changed
     [uvms, mission] = UpdateMissionPhase(uvms, mission);
     
@@ -108,6 +124,6 @@ end
 fclose(uVehicle);
 fclose(uArm);
 
-PrintPlot(plt);
+PrintPlot(plt,uvms);
 
 end

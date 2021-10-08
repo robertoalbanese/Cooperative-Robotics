@@ -42,24 +42,41 @@ uvms.Jha = [];
 uvms.Jt_a = [];
 uvms.Jt_v = [];
 uvms.Jt = [];
-uvms.Jma = [];
+uvms.Jua = [];
+uvms.Jha = [];
+uvms.Jmd = [];
+uvms.Jl = [];
+uvms.Jra = [];
+uvms.Jzv = [];
+uvms.Jjlim = [];
 
 uvms.xdot.jl = [];
 uvms.xdot.mu = [];
 uvms.xdot.ha = [];
 uvms.xdot.t = [];
 uvms.xdot.v = [];
-uvms.xdot.ma = [];
+uvms.xdot.ua = [];
+uvms.xdot.ha = [];
+uvms.xdot.md = [];
+uvms.xdot.l = [];
+uvms.xdot.ra = [];
+uvms.xdot.zv = [];
+uvms.xdot.jlim = [];
     
 uvms.A.jl = zeros(7,7);
 uvms.A.mu = 0;
 uvms.A.ha = zeros(1,1);
 uvms.A.t = zeros(6,6);
-uvms.A.ma = 0; 
-uvms.Aa.v = eye(6);
-uvms.Aa.ha = eye(1);
-uvms.Aa.t = zeros(6);
-uvms.Aa.ma = eye(1);
+uvms.A.v = zeros(6,6);
+uvms.A.ua = eye(6);
+uvms.A.ha = eye(1);
+uvms.A.md = eye(1);
+uvms.A.l = eye(1);
+uvms.A.ra = eye(1);
+uvms.A.zv = eye(6);
+uvms.A.jlim = eye(7);
+
+uvms.v_rho = zeros(3,1);
 
 end
 
